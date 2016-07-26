@@ -4,6 +4,7 @@ from googleapiclient import discovery
 import httplib2
 import json
 from oauth2client.client import GoogleCredentials
+import sys
 
 DISCOVERY_URL = ('https://{api}.googleapis.com/'
                  '$discovery/rest?version={apiVersion}')
@@ -17,10 +18,10 @@ def main(tweet_timeline_json_file):
     tweet_analysis = anaylze_content(tweet['text'])
     tweet['analysis'] = tweet_analysis
     tweets_analyzed += 1
-    if tweets_analyzed % 50 == 0:
-      print tweets_analyzed + "tweets analyzed so far."
+    if tweets_analyzed % 20 == 0:
+      print "%s tweets analyzed so far." % tweets_analyzed
 
-  with open('%s_tweets_analyzed.json' % tweet_timeline_json_file[:-5], 'wb') as f:
+  with open('%s_analyzed.json' % tweet_timeline_json_file[:-5], 'wb') as f:
     json.dump(tweets, f)
 
 def anaylze_content(text):
@@ -52,9 +53,12 @@ def anaylze_content(text):
             "encodingType":"UTF8"
           })
 
-  response = service_request.execute()
+  try:
+    response = service_request.execute()
+    return response
+  except:
+    return {"error_msg": str(sys.exc_info()[1])}
 
-  return response
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
