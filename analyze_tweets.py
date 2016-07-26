@@ -12,15 +12,16 @@ def main(tweet_timeline_json_file):
   with open(tweet_timeline_json_file) as f:
     tweets = json.load(f)
 
+  tweets_analyzed =   0
   for tweet in tweets:
-    print tweet['text']
     tweet_analysis = anaylze_content(tweet['text'])
     tweet['analysis'] = tweet_analysis
-    print tweet_analysis
+    tweets_analyzed += 1
+    if tweets_analyzed % 50 == 0:
+      print tweets_analyzed + "tweets analyzed so far."
 
   with open('%s_tweets_analyzed.json' % tweet_timeline_json_file[:-5], 'wb') as f:
     json.dump(tweets, f)
-
 
 def anaylze_content(text):
   '''Run a sentiment analysis request on text within a passed filename
@@ -54,7 +55,6 @@ def anaylze_content(text):
   response = service_request.execute()
 
   return response
-
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
